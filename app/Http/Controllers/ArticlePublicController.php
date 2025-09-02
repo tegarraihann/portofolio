@@ -46,7 +46,7 @@ class ArticlePublicController extends Controller
 
     public function index()
     {
-        $articles = Article::with(['category','tags'])
+        $articles = Article::with(['category', 'tags'])
             ->where('status', 'published')
             ->orderBy('created_at', 'desc')
             ->paginate(6);
@@ -58,13 +58,24 @@ class ArticlePublicController extends Controller
 
     public function show(string $slug)
     {
-        $article = Article::with(['category','tags'])
+        $article = Article::with(['category', 'tags'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->firstOrFail();
 
+        $metaData = [
+            'title' => $article->title,
+            'description' => $article->excerpt ?: strip_tags(substr($article->content, 0, 160)),
+            'image' => $article->thumbnail_path ? asset('storage/' . ltrim($article->thumbnail_path, '/')) : null,
+            'url' => request()->url(),
+            'type' => 'article',
+            'site_name' => config('app.name')
+        ];
+
         return Inertia::render('Articles/Show', [
-            'article' => $article
+            'article' => $article,
+            'metaData' => $metaData
         ]);
+
     }
 }

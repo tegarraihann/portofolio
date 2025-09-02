@@ -19,6 +19,12 @@ class Article extends Model
         'thumbnail_path',
     ];
 
+    protected $appends = ['thumbnail_url'];
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail_path ? asset('storage/' . ltrim($this->thumbnail_path, '/')) : null;
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
