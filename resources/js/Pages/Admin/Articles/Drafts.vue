@@ -18,20 +18,29 @@
         </div>
 
         <!-- Tabel Draft Artikel -->
-        <div class="overflow-auto bg-white shadow rounded-lg">
-          <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto bg-white shadow rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200 text-sm table-fixed">
+            <colgroup>
+              <col class="w-1/2" />
+              <col class="w-1/6" />
+              <col class="w-1/6" />
+              <col />
+            </colgroup>
             <thead class="bg-gray-100">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Judul</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dibuat</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/2">Judul</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Kategori</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Dibuat</th>
                 <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="draft in drafts.data" :key="draft.id">
-                <td class="px-6 py-4 whitespace-nowrap text-gray-800">{{ draft.title }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ draft.category?.name || '—' }}</td>
+                <td class="px-6 py-4 w-1/2 max-w-0 whitespace-normal break-words break-all align-top">
+                  <span class="block text-gray-800 font-medium break-words break-all">{{ draft.title }}</span>
+                  <span class="block text-xs text-gray-500 break-words break-all">{{ draft.slug }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ draft.category?.name || '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ new Date(draft.created_at).toLocaleDateString('id-ID') }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
@@ -65,20 +74,12 @@
 </template>
 
 <script setup>
-// PERBAIKAN: Gunakan import yang benar untuk Vue 3 + Inertia
-import { Link } from '@inertiajs/vue3'
-import { usePage } from '@inertiajs/vue3'
+import { Link, usePage } from '@inertiajs/vue3'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
 import Pagination from '@/Components/Pagination.vue'
 import { PlusIcon } from '@heroicons/vue/24/outline'
 
-// Ambil props dengan cara yang benar
 const { props } = usePage()
 const { drafts } = props
-
-// Atau bisa juga menggunakan defineProps
-// const props = defineProps({
-//   drafts: Object
-// })
 </script>

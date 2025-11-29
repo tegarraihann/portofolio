@@ -14,24 +14,24 @@
               <p class="text-gray-600 mt-1">Selamat datang kembali! Berikut ringkasan website Anda hari ini.</p>
             </div>
             <div class="flex space-x-3">
-              <router-link
-                to="/admin/articles/create"
+              <Link
+                href="/admin/articles/create"
                 class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center"
               >
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Tulis Artikel
-              </router-link>
-              <router-link
-                to="/admin/projects/create"
+              </Link>
+              <Link
+                href="/admin/projects/create"
                 class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
               >
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Tambah Project
-              </router-link>
+              </Link>
             </div>
           </div>
         </div>
@@ -115,14 +115,20 @@
                 <option value="90">3 Bulan Terakhir</option>
               </select>
             </div>
-            <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <!-- Placeholder for chart -->
-              <div class="text-center">
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 00-2-2H5a2 2 0 00-2-2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                <p class="text-gray-500">Chart akan ditampilkan di sini</p>
-                <p class="text-sm text-gray-400">Integrasi dengan analytics library</p>
+            <div class="space-y-4">
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                  <span class="inline-block w-3 h-3 rounded-full bg-indigo-500"></span> Total Visits
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-600">
+                  <span class="inline-block w-3 h-3 rounded-full bg-green-500"></span> Unique Visitors
+                </div>
+              </div>
+              <div v-if="currentTrend.labels.length" class="h-64 bg-gray-50 rounded-lg p-4">
+                <Line :data="chartData" :options="chartOptions" />
+              </div>
+              <div v-else class="h-64 flex items-center justify-center text-gray-500 bg-gray-50 rounded-lg">
+                Belum ada data kunjungan.
               </div>
             </div>
           </div>
@@ -131,9 +137,9 @@
           <div class="bg-white rounded-xl shadow-md p-6">
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-semibold text-gray-900">Artikel Populer</h3>
-              <router-link to="/admin/articles" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+              <Link href="/admin/articles" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
                 Lihat Semua
-              </router-link>
+              </Link>
             </div>
             <div class="space-y-4">
               <div
@@ -236,109 +242,120 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { Link, router } from '@inertiajs/vue3'
+import {
+  Chart,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  CategoryScale,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Line } from 'vue-chartjs'
 import AdminSidebar from './Components/AdminSidebar.vue'
 import AdminNavbar from './Components/AdminNavbar.vue'
 import StatsCard from './Components/StatsCard.vue'
 import RecentActivity from './Components/RecentActivity.vue'
 
-const router = useRouter()
+Chart.register(LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip, Legend)
 
 // Reactive data
 const chartPeriod = ref('7')
 
-const stats = reactive({
-  totalArticles: 145,
-  totalProjects: 23,
-  monthlyVisitors: 12847,
-  unreadMessages: 8,
-  newMessagesToday: 3,
-  draftArticles: 12,
-  totalCategories: 8,
-  popularArticles: 5,
-  averageViews: 1247
+const props = defineProps({
+  stats: {
+    type: Object,
+    default: () => ({})
+  },
+  visitTrends: {
+    type: Object,
+    default: () => ({})
+  },
+  popularArticles: {
+    type: Array,
+    default: () => []
+  },
+  recentArticles: {
+    type: Array,
+    default: () => []
+  },
+  recentProjects: {
+    type: Array,
+    default: () => []
+  }
 })
 
-const popularArticles = ref([
-  {
-    id: 1,
-    title: 'Cara Mengoptimalkan Performance Website dengan Vue.js',
-    views: 2547,
-    created_at: '2024-01-15'
-  },
-  {
-    id: 2,
-    title: 'Tutorial Lengkap Laravel untuk Pemula',
-    views: 1892,
-    created_at: '2024-01-14'
-  },
-  {
-    id: 3,
-    title: 'Best Practices dalam Development API RESTful',
-    views: 1654,
-    created_at: '2024-01-13'
-  },
-  {
-    id: 4,
-    title: 'Implementasi Authentication dengan JWT',
-    views: 1423,
-    created_at: '2024-01-12'
-  },
-  {
-    id: 5,
-    title: 'Design Pattern yang Wajib Diketahui Developer',
-    views: 1287,
-    created_at: '2024-01-11'
-  }
-])
+const stats = reactive({
+  totalArticles: props.stats.totalArticles ?? 0,
+  totalProjects: props.stats.totalProjects ?? 0,
+  monthlyVisitors: props.stats.monthlyVisitors ?? 0,
+  unreadMessages: props.stats.unreadMessages ?? 0,
+  newMessagesToday: props.stats.newMessagesToday ?? 0,
+  draftArticles: props.stats.draftArticles ?? 0,
+  totalCategories: props.stats.totalCategories ?? 0,
+  popularArticles: props.stats.popularArticles ?? 0,
+  averageViews: props.stats.averageViews ?? 0
+})
 
-const recentArticles = ref([
-  {
-    id: 1,
-    title: 'Tips Optimasi Database MySQL',
-    status: 'published',
-    created_at: '2024-01-16',
-    author: 'Admin'
-  },
-  {
-    id: 2,
-    title: 'Pengenalan Docker untuk Developer',
-    status: 'draft',
-    created_at: '2024-01-15',
-    author: 'Admin'
-  },
-  {
-    id: 3,
-    title: 'Microservices Architecture Guide',
-    status: 'published',
-    created_at: '2024-01-14',
-    author: 'Admin'
-  }
-])
+const currentTrend = computed(() => props.visitTrends?.[chartPeriod.value] ?? { labels: [], total: [], unique: [] })
+const chartData = computed(() => ({
+  labels: currentTrend.value.labels,
+  datasets: [
+    {
+      label: 'Total Visits',
+      data: currentTrend.value.total,
+      borderColor: '#6366f1',
+      backgroundColor: 'rgba(99, 102, 241, 0.1)',
+      tension: 0.3,
+      pointRadius: 2,
+    },
+    {
+      label: 'Unique Visitors',
+      data: currentTrend.value.unique,
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34, 197, 94, 0.1)',
+      tension: 0.3,
+      pointRadius: 2,
+    },
+  ],
+}))
 
-const recentProjects = ref([
-  {
-    id: 1,
-    title: 'E-Commerce Platform',
-    status: 'in_progress',
-    created_at: '2024-01-15',
-    technology: 'Laravel + Vue.js'
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top',
+      labels: {
+        usePointStyle: true,
+      },
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+    },
   },
-  {
-    id: 2,
-    title: 'Portfolio Website',
-    status: 'completed',
-    created_at: '2024-01-14',
-    technology: 'Next.js'
+  interaction: {
+    mode: 'nearest',
+    intersect: false,
   },
-  {
-    id: 3,
-    title: 'API Management System',
-    status: 'planning',
-    created_at: '2024-01-13',
-    technology: 'Node.js'
-  }
-])
+  scales: {
+    x: {
+      grid: { display: false },
+      ticks: { autoSkip: true, maxTicksLimit: 6 },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: { precision: 0 },
+    },
+  },
+}
+
+const popularArticles = computed(() => props.popularArticles ?? [])
+const recentArticles = computed(() => props.recentArticles ?? [])
+const recentProjects = computed(() => props.recentProjects ?? [])
 
 const recentMessages = ref([
   {
@@ -392,31 +409,31 @@ const loadDashboardData = async () => {
 
 // Event handlers
 const handleViewAllArticles = () => {
-  router.push('/admin/articles')
+  router.visit('/admin/articles')
 }
 
 const handleViewAllProjects = () => {
-  router.push('/admin/projects')
+  router.visit('/admin/projects')
 }
 
 const handleViewAllMessages = () => {
-  router.push('/admin/messages')
+  router.visit('/admin/messages')
 }
 
 const handleCreateArticle = () => {
-  router.push('/admin/articles/create')
+  router.visit('/admin/articles/create')
 }
 
 const handleCreateProject = () => {
-  router.push('/admin/projects/create')
+  router.visit('/admin/projects/create')
 }
 
 const handleManageCategories = () => {
-  router.push('/admin/categories')
+  router.visit('/admin/categories')
 }
 
 const handleSettings = () => {
-  router.push('/admin/settings')
+  router.visit('/admin/settings')
 }
 
 // Computed properties
@@ -447,9 +464,9 @@ watch(chartPeriod, (newPeriod) => {
   @apply bg-white rounded-xl shadow-md p-6;
 }
 
-.dashboard-card:hover {
-  @apply shadow-lg transform scale-[1.02] transition-all duration-200;
-}
+  .dashboard-card:hover {
+    @apply shadow-lg transform scale-[1.02] transition-all duration-200;
+  }
 
 /* Animation for stats cards */
 .stats-enter-active, .stats-leave-active {
@@ -481,22 +498,5 @@ watch(chartPeriod, (newPeriod) => {
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .bg-gray-50 {
-    @apply bg-gray-900;
-  }
-
-  .text-gray-900 {
-    @apply text-white;
-  }
-
-  .text-gray-600 {
-    @apply text-gray-300;
-  }
-
-  .bg-white {
-    @apply bg-gray-800;
-  }
-}
+/* Hilangkan override dark untuk menjaga konsistensi tema terang di panel admin */
 </style>

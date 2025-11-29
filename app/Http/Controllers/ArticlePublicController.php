@@ -56,12 +56,9 @@ class ArticlePublicController extends Controller
         ]);
     }
 
-    public function show(string $slug)
+    public function show(Article $article)
     {
-        $article = Article::with(['category', 'tags'])
-            ->where('slug', $slug)
-            ->where('status', 'published')
-            ->firstOrFail();
+        $article->load(['category', 'tags']);
 
         $metaData = [
             'title' => $article->title,

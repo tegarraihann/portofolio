@@ -138,7 +138,7 @@ const props = defineProps({
 const viewMode = ref('grid')
 
 
-const projects = ref(props.projects)
+const projects = ref(props.projects ?? [])
 
 const filters = reactive({
     search: '',
@@ -152,11 +152,16 @@ const filteredProjects = computed(() => {
     // Search filter
     if (filters.search) {
         const searchTerm = filters.search.toLowerCase()
-        filtered = filtered.filter(project =>
-            project.title.toLowerCase().includes(searchTerm) ||
-            project.description.toLowerCase().includes(searchTerm) ||
-            project.technologies.some(tech => tech.toLowerCase().includes(searchTerm))
-        )
+        filtered = filtered.filter(project => {
+            const title = (project.title || '').toLowerCase()
+            const description = (project.description || '').toLowerCase()
+            const techs = Array.isArray(project.tech_stack) ? project.tech_stack : []
+            return (
+                title.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                techs.some(tech => (tech || '').toLowerCase().includes(searchTerm))
+            )
+        })
     }
 
     // Category filter
@@ -174,13 +179,13 @@ const filteredProjects = computed(() => {
                 filtered = filtered.filter(project => !project.is_active)
                 break
             case 'featured':
-                filtered = filtered.filter(project => project.featured)
+                filtered = filtered.filter(project => project.is_featured)
                 break
         }
     }
 
     // Sort by sort_order
-    return filtered.sort((a, b) => a.sort_order - b.sort_order)
+    return filtered.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 })
 
 // Methods

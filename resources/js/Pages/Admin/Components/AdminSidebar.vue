@@ -10,7 +10,7 @@
         <!-- Navigation -->
         <nav class="p-4 space-y-2">
             <!-- Dashboard -->
-            <Link href="/admin/dashboard"
+            <Link :href="route('dashboard')"
                 class="flex items-center p-3 rounded-lg text-white hover:bg-indigo-600 transition-colors duration-200"
                 :class="{ 'bg-indigo-600': $page.url === '/admin/dashboard' }">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,27 +50,27 @@
                     </button>
 
                     <div v-show="isArticlesMenuOpen" class="ml-8 space-y-1">
-                        <Link href="/admin/articles"
+                        <Link :href="route('admin.articles.index')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/articles' }">
                         Semua Artikel
                         </Link>
-                        <Link href="/admin/articles/create"
+                        <Link :href="route('admin.articles.create')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/articles/create' }">
                         Tambah Artikel
                         </Link>
-                        <Link href="/admin/articles/drafts"
+                        <Link :href="route('admin.articles.drafts')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/articles/drafts' }">
                         Draft Artikel
                         </Link>
-                        <Link href="/admin/categories"
+                        <Link :href="route('admin.categories.index')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/categories' }">
                         Kategori
                         </Link>
-                        <Link href="/admin/tags"
+                        <Link :href="route('admin.tags.index')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/tags' }">
                         Tags
@@ -99,12 +99,12 @@
                     </button>
 
                     <div v-show="isProjectsMenuOpen" class="ml-8 space-y-1">
-                        <Link href="/admin/projects"
+                        <Link :href="route('admin.projects.index')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/projects' }">
                         Semua Projects
                         </Link>
-                        <Link href="/admin/projects/create"
+                        <Link :href="route('admin.projects.create')"
                             class="block p-2 rounded-lg text-indigo-200 hover:text-white hover:bg-indigo-600 transition-colors duration-200"
                             :class="{ 'text-white bg-indigo-600': $page.url === '/admin/projects/create' }">
                         Tambah Project

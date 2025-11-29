@@ -31,7 +31,9 @@
         "@tiptap/starter-kit": "^2.14.0",
         "@tiptap/vue-3": "^2.14.0",
         "@vueuse/motion": "^3.0.3",
+        "chart.js": "^4.5.1",
         "lucide-vue-next": "^0.503.0",
+        "vue-chartjs": "^5.3.3",
         "vue-router": "^4.5.1"
     }
 }

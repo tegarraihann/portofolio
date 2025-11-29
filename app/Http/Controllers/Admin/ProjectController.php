@@ -45,6 +45,11 @@ class ProjectController extends Controller
         return Inertia::render('Admin/Project/Edit', compact('project'));
     }
 
+    public function show(Project $project)
+    {
+        return Inertia::render('Admin/Project/Show', compact('project'));
+    }
+
     public function update(StoreProjectRequest $request, Project $project)
     {
         $data = $request->validated();
@@ -56,6 +61,9 @@ class ProjectController extends Controller
                 Storage::disk('public')->delete($project->thumbnail);
             }
             $data['thumbnail'] = $request->file('thumbnail')->store('projects', 'public');
+        } else {
+            // Jangan timpa thumbnail lama jika tidak ada upload baru
+            unset($data['thumbnail']);
         }
 
         $project->update($data);
