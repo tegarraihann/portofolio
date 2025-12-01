@@ -1,0 +1,1 @@
+import{_ as t}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{c as s,o as a,d as o}from"./app-CACu8VI1.js";const n={},r={class:"bg-white shadow p-4 flex justify-between items-center"};function c(d,e){return a(),s("header",r,e[0]||(e[0]=[o("div",{class:"font-semibold text-lg"},"Selamat datang, Admin!",-1)]))}const f=t(n,[["render",c]]);export{f as default};
