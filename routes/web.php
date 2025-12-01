@@ -10,6 +10,7 @@ use App\Http\Controllers\ArticlePublicController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryProjectController;
+use App\Http\Controllers\Admin\CvController;
 use App\Http\Middleware\TrackArticleView;
 
 Route::middleware(['auth','verified'])
@@ -44,6 +45,10 @@ Route::middleware(['auth','verified'])
 
         // Projects routes
         Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+
+        // CV download management
+        Route::get('cv', [CvController::class, 'index'])->name('cv.index');
+        Route::post('cv', [CvController::class, 'store'])->name('cv.store');
 });
 
 Route::middleware('auth')->group(function () {

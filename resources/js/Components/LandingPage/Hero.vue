@@ -3,6 +3,12 @@ import { Link } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
 
 const isVisible = ref(false)
+const props = defineProps({
+  cvUrl: {
+    type: String,
+    default: '/cv.pdf'
+  }
+})
 
 onMounted(() => {
   setTimeout(() => {
@@ -76,7 +82,7 @@ const scrollToAbout = () => {
           </button>
 
           <a
-            href="/cv.pdf"
+            :href="props.cvUrl || '/cv.pdf'"
             target="_blank"
             class="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-full hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm"
           >

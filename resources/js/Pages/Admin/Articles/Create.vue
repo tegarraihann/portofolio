@@ -119,6 +119,8 @@ function onFileChange(event) {
 }
 
 function submit() {
-    form.post(route('admin.articles.store'))
+    form.post(route('admin.articles.store'), {
+        forceFormData: true,
+    })
 }
 </script>

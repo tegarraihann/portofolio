@@ -113,6 +113,7 @@ const form = useForm({
   content: article.content,
   status: article.status,
   thumbnail_path: article.thumbnail_path || '', // Untuk menampilkan gambar thumbnail
+  thumbnail: null,
 })
 
 function onFileChange(event) {
@@ -120,26 +121,9 @@ function onFileChange(event) {
 }
 
 function submit() {
-  const formData = new FormData();
-
-  // Tambahkan semua field form
-  formData.append('title', form.title);
-  formData.append('category_id', form.category_id);
-  formData.append('tags', form.tags.join(',')); // Konversi tags ke format yang sesuai
-  formData.append('excerpt', form.excerpt);
-  formData.append('content', form.content);
-  formData.append('status', form.status);
-
-  // Jika ada thumbnail baru, tambahkan file-nya
-  if (form.thumbnail) {
-    formData.append('thumbnail', form.thumbnail);
-  }
-
-  // Kirim data menggunakan FormData
   form.put(route('admin.articles.update', article.id), {
-    data: formData,
+    forceFormData: true,
     preserveScroll: true,
   })
-
 }
 </script>

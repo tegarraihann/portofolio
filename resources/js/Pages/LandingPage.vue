@@ -13,6 +13,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  cvUrl: {
+    type: String,
+    default: null
+  },
   projects: {
     type: Array,
     default: () => []
@@ -59,7 +63,7 @@ onMounted(() => {
     <div v-else class="landing-page">
       <Navbar />
       <main>
-        <Hero />
+        <Hero :cv-url="cvUrl" />
         <About :blogs="blogs" />
         <LatestArticles :articles="articles" />
         <Projects :projects="projects" />

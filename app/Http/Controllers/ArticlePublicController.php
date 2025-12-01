@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\Project;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class ArticlePublicController extends Controller
 {
@@ -26,7 +27,8 @@ class ArticlePublicController extends Controller
         // Kirim data ke frontend
         return Inertia::render('LandingPage', [
             'articles' => $articles,
-            'projects' => $projects
+            'projects' => $projects,
+            'cvUrl' => $this->getCvUrl(),
         ]);
     }
 
@@ -74,5 +76,22 @@ class ArticlePublicController extends Controller
             'metaData' => $metaData
         ]);
 
+    }
+
+    private function getCvUrl(): ?string
+    {
+        $disk = Storage::disk('public');
+        foreach (['cv/cv.pdf', 'cv/cv.docx', 'cv/cv.doc'] as $candidate) {
+            if ($disk->exists($candidate)) {
+                return $disk->url($candidate);
+            }
+        }
+
+        // Fallback ke file di public root jika ada
+        if (file_exists(public_path('cv.pdf'))) {
+            return asset('cv.pdf');
+        }
+
+        return null;
     }
 }

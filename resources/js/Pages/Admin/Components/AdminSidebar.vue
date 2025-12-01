@@ -257,6 +257,17 @@
                 Social Media
                 </Link>
 
+                <Link :href="route('admin.cv.index')"
+                    class="flex items-center p-3 rounded-lg text-white hover:bg-indigo-600 transition-colors duration-200"
+                    :class="{ 'bg-indigo-600': $page.url === '/admin/cv' }">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 11V3m0 8l-3-3m3 3l3-3m-9 4v7a2 2 0 002 2h8a2 2 0 002-2v-7m-2 4H9">
+                    </path>
+                </svg>
+                CV Download
+                </Link>
+
                 <Link href="/admin/site-settings"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-indigo-600 transition-colors duration-200"
                     :class="{ 'bg-indigo-600': $page.url === '/admin/site-settings' }">
