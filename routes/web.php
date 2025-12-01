@@ -12,49 +12,42 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryProjectController;
 use App\Http\Middleware\TrackArticleView;
 
-Route::domain('admin.akmalicode.site')->group(function () {
-    // Root subdomain langsung arahkan ke halaman login
-    Route::get('/', function () {
-        return redirect()->route('login');
-    });
+Route::middleware(['auth','verified'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function() {
+        // PENTING: Route drafts harus didefinisikan SEBELUM resource route
+        Route::get('articles/drafts', [ArticleController::class, 'drafts'])
+            ->name('articles.drafts');
 
-    Route::middleware(['auth','verified'])
-        ->prefix('admin')
-        ->name('admin.')
-        ->group(function() {
-            // PENTING: Route drafts harus didefinisikan SEBELUM resource route
-            Route::get('articles/drafts', [ArticleController::class, 'drafts'])
-                ->name('articles.drafts');
+        // Route untuk upload image - DIPERBAIKI: hapus prefix admin berlebih
+        Route::post('articles/upload-image', [ArticleController::class, 'uploadImage'])
+            ->name('articles.uploadImage');
 
-            // Route untuk upload image - DIPERBAIKI: hapus prefix admin berlebih
-            Route::post('articles/upload-image', [ArticleController::class, 'uploadImage'])
-                ->name('articles.uploadImage');
+        // Route untuk preview
+        Route::get('articles/preview/{article}', [ArticleController::class, 'preview'])
+            ->name('articles.preview');
 
-            // Route untuk preview
-            Route::get('articles/preview/{article}', [ArticleController::class, 'preview'])
-                ->name('articles.preview');
+        // Route untuk bulk action - DIPERBAIKI: hapus prefix admin berlebih
+        Route::post('articles/bulk-action', [ArticleController::class, 'bulkAction'])
+            ->name('articles.bulk-action');
 
-            // Route untuk bulk action - DIPERBAIKI: hapus prefix admin berlebih
-            Route::post('articles/bulk-action', [ArticleController::class, 'bulkAction'])
-                ->name('articles.bulk-action');
+        // Resource route
+        Route::resource('articles', ArticleController::class)
+            ->except(['show']);
 
-            // Resource route
-            Route::resource('articles', ArticleController::class)
-                ->except(['show']);
+        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)
+            ->except(['show']);
 
-            Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)
-                ->except(['show']);
+        Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)
+            ->except(['show']);
 
-            Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)
-                ->except(['show']);
+        // Projects routes
+        Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+});
 
-            // Projects routes
-            Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
-    });
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    });
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // Landing Page Route - Gabungkan projects dan articles
