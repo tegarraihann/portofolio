@@ -121,33 +121,14 @@ function onFileChange(event) {
 }
 
 function submit() {
-  const formData = new FormData()
-
-  formData.append('title', form.title || '')
-  formData.append('category_id', form.category_id || '')
-  formData.append('excerpt', form.excerpt || '')
-  formData.append('content', form.content || '')
-  formData.append('status', form.status || 'draft')
-
-  // Append tags as array
-  if (Array.isArray(form.tags)) {
-    form.tags.forEach((tagId, index) => {
-      formData.append(`tags[${index}]`, tagId)
-    })
-  }
-
-  // Append new thumbnail if selected
-  if (form.thumbnail) {
-    formData.append('thumbnail', form.thumbnail)
-  }
-
-  // Method spoofing for PUT
-  formData.append('_method', 'PUT')
+  form.transform((data) => ({
+    ...data,
+    _method: 'put',
+  }))
 
   form.post(route('admin.articles.update', article.id), {
-    data: formData,
-    forceFormData: true,
     preserveScroll: true,
+    forceFormData: true,
   })
 }
 </script>

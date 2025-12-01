@@ -1,1 +1,0 @@
-import{F as o}from"./Footer-D1pDqpE0.js";import{c as t,o as a,d as e,A as r,b as c}from"./app-CACu8VI1.js";const n={class:"min-h-screen bg-gray-50"},_={class:"flex-1"},i={class:"bg-gray-900 text-white"},f={__name:"LandingLayout",setup(d){return(s,l)=>(a(),t("div",n,[e("main",_,[r(s.$slots,"default")]),e("footer",i,[c(o)])]))}};export{f as _};
