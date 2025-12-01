@@ -131,6 +131,7 @@ import { ref, defineProps, computed, reactive } from 'vue'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
 import { Link, router } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 
 const props = defineProps({
     projects: Array
@@ -199,15 +200,43 @@ const getCategoryLabel = (category) => {
 }
 
 const deleteProject = async (id) => {
-    if (!confirm('Yakin ingin menghapus project ini?')) return
+    const result = await Swal.fire({
+        title: 'Hapus project?',
+        text: 'Tindakan ini tidak dapat dibatalkan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DC2626',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal',
+    })
+
+    if (!result.isConfirmed) return
 
     router.delete(route('admin.projects.destroy', id), {
+        preserveScroll: true,
         onSuccess: () => {
-            alert('Project berhasil dihapus!')
+            router.visit(route('admin.projects.index'), {
+                preserveScroll: true,
+                replace: true,
+                only: ['projects'],
+            })
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Project dihapus',
+                showConfirmButton: false,
+                timer: 1500,
+            })
         },
         onError: () => {
-            alert('Terjadi kesalahan saat menghapus project')
-        }
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Terjadi kesalahan saat menghapus project',
+            })
+        },
     })
 }
 </script>

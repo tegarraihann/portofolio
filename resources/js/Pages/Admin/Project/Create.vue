@@ -74,6 +74,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useForm, router } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 
 const form = useForm({
     title: '',
@@ -107,7 +108,26 @@ function handleThumbnail(event) {
 
 function submitForm() {
     console.log('Tech Stack to submit:', form.tech_stack)
-    form.post(route('admin.projects.store'))
+    form.post(route('admin.projects.store'), {
+        forceFormData: true,
+        onSuccess: () => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Project berhasil dibuat',
+                showConfirmButton: false,
+                timer: 1500,
+            })
+        },
+        onError: () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Periksa kembali input Anda.',
+            })
+        }
+    })
 }
 
 </script>

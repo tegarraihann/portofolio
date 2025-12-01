@@ -31,6 +31,10 @@ class StoreProjectRequest extends FormRequest
             'live_demo_url' => ['nullable', 'url'],
             'github_url' => ['nullable', 'url'],
             'is_featured' => ['nullable', 'boolean'],
+            'meta_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:255'],
+            'meta_image' => ['nullable', 'string', 'max:255'],
+            'noindex' => ['nullable', 'boolean'],
         ];
     }
 }

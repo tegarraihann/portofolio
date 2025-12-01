@@ -101,6 +101,7 @@ import AdminNavbar from '../Components/AdminNavbar.vue'
 import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import RichTextEditor from '@/Components/RichTextEditor.vue'
+import Swal from 'sweetalert2'
 
 const { props } = usePage()
 const { article, categories, tags } = props
@@ -129,6 +130,23 @@ function submit() {
   form.post(route('admin.articles.update', article.id), {
     preserveScroll: true,
     forceFormData: true,
+    onSuccess: () => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Artikel berhasil diperbarui',
+        showConfirmButton: false,
+        timer: 1500,
+      })
+    },
+    onError: () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Periksa kembali input Anda.',
+      })
+    },
   })
 }
 </script>

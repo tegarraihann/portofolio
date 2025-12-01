@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryProjectController;
 use App\Http\Controllers\Admin\CvController;
+use App\Http\Controllers\Admin\SeoController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Middleware\TrackArticleView;
 
 Route::middleware(['auth','verified'])
@@ -49,6 +51,15 @@ Route::middleware(['auth','verified'])
         // CV download management
         Route::get('cv', [CvController::class, 'index'])->name('cv.index');
         Route::post('cv', [CvController::class, 'store'])->name('cv.store');
+
+        // SEO settings
+        Route::get('seo', [SeoController::class, 'index'])->name('seo.index');
+        Route::post('seo', [SeoController::class, 'update'])->name('seo.update');
+
+        // Media library
+        Route::get('media', [MediaController::class, 'index'])->name('media.index');
+        Route::post('media', [MediaController::class, 'store'])->name('media.store');
+        Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
 });
 
 Route::middleware('auth')->group(function () {

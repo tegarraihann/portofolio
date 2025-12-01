@@ -105,6 +105,7 @@
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
+import Swal from 'sweetalert2'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
 
@@ -158,6 +159,23 @@ function submit() {
   form.post(route('admin.projects.update', project.id), {
     forceFormData: true,
     preserveScroll: true,
+    onSuccess: () => {
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Project berhasil diperbarui',
+        showConfirmButton: false,
+        timer: 1500,
+      })
+    },
+    onError: () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: 'Periksa kembali input Anda.',
+      })
+    },
     onFinish: () => {
       form.transform(data => {
         const { _method, ...rest } = data

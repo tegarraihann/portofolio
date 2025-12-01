@@ -100,6 +100,7 @@ import AdminNavbar from '../Components/AdminNavbar.vue'
 import { ref } from 'vue'
 import { usePage } from '@inertiajs/vue3'
 import RichTextEditor from '@/Components/RichTextEditor.vue'
+import Swal from 'sweetalert2'
 
 const { props } = usePage()
 const { categories, tags } = props
@@ -121,6 +122,23 @@ function onFileChange(event) {
 function submit() {
     form.post(route('admin.articles.store'), {
         forceFormData: true,
+        onSuccess: () => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Artikel berhasil dibuat',
+                showConfirmButton: false,
+                timer: 1500,
+            })
+        },
+        onError: () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Periksa kembali input Anda.',
+            })
+        }
     })
 }
 </script>

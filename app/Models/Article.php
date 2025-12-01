@@ -17,9 +17,17 @@ class Article extends Model
         'content',
         'status',
         'thumbnail_path',
+        'meta_title',
+        'meta_description',
+        'meta_image',
+        'noindex',
     ];
 
     protected $appends = ['thumbnail_url'];
+
+    protected $casts = [
+        'noindex' => 'boolean',
+    ];
     public function getThumbnailUrlAttribute()
     {
         return $this->thumbnail_path ? asset('storage/' . ltrim($this->thumbnail_path, '/')) : null;

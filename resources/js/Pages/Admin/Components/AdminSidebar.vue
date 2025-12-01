@@ -123,7 +123,7 @@
                 </div>
 
                 <!-- Media Library -->
-                <Link href="/admin/media"
+                <Link :href="route('admin.media.index')"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-indigo-600 transition-colors duration-200"
                     :class="{ 'bg-indigo-600': $page.url === '/admin/media' }">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@
                 </span>
                 </Link>
 
-                <Link href="/admin/seo"
+                <Link :href="route('admin.seo.index')"
                     class="flex items-center p-3 rounded-lg text-white hover:bg-indigo-600 transition-colors duration-200"
                     :class="{ 'bg-indigo-600': $page.url === '/admin/seo' }">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

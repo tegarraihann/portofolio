@@ -74,15 +74,13 @@
                                     <Link :href="route('admin.articles.edit', article.id)" class="text-indigo-600 hover:text-indigo-900 mr-4">
                                         Edit
                                     </Link>
-                                    <Link
-                                        :href="route('admin.articles.destroy', article.id)"
-                                        method="delete"
-                                        as="button"
+                                    <button
+                                        type="button"
+                                        @click="deleteArticle(article.id)"
                                         class="text-red-600 hover:text-red-900"
-                                        confirm="Anda yakin ingin menghapus?"
                                     >
                                         Hapus
-                                    </Link>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -99,15 +97,57 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
 import Pagination from '@/Components/Pagination.vue'
 import PlusIcon from 'lucide-vue-next/dist/esm/icons/plus.js'
 import { usePage } from '@inertiajs/vue3'
+import Swal from 'sweetalert2'
 
 const { props } = usePage()
 const articles = props.articles
+
+const deleteArticle = async (id) => {
+    const result = await Swal.fire({
+        title: 'Hapus artikel?',
+        text: 'Tindakan ini tidak dapat dibatalkan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DC2626',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal',
+    })
+
+    if (!result.isConfirmed) return
+
+    router.delete(route('admin.articles.destroy', id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            router.visit(route('admin.articles.index'), {
+                preserveScroll: true,
+                replace: true,
+                only: ['articles'],
+            })
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Artikel dihapus',
+                showConfirmButton: false,
+                timer: 1500,
+            })
+        },
+        onError: () => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: 'Terjadi kesalahan saat menghapus artikel',
+            })
+        },
+    })
+}
 </script>
 
 <style scoped>

@@ -32,6 +32,8 @@ class ArticleRequest extends FormRequest
             'tags.*'       => 'exists:tags,id',
             'meta_title'       => 'nullable|string|max:60',
             'meta_description' => 'nullable|string|max:160',
+            'meta_image'       => 'nullable|string|max:255',
+            'noindex'          => 'nullable|boolean',
         ];
     }
 
