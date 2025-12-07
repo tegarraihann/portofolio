@@ -292,14 +292,40 @@ const copyLink = async () => {
 
 /* Responsive table */
 .article-content :deep(table) {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #d1d5db;
+    table-layout: auto;
+    margin: 1rem 0 1.25rem;
     overflow-x: auto;
-    display: block;
-    white-space: nowrap;
 }
-
-@media (max-width: 768px) {
-    .article-content :deep(table) {
-        font-size: 0.875rem;
-    }
+.article-content :deep(table),
+.article-content :deep(th),
+.article-content :deep(td) {
+    border-color: #d1d5db !important;
+    background-color: #fff;
+}
+.article-content :deep(thead) {
+    display: table-header-group;
+}
+.article-content :deep(tbody) {
+    display: table-row-group;
+}
+.article-content :deep(tr) {
+    display: table-row;
+}
+.article-content :deep(th),
+.article-content :deep(td) {
+    display: table-cell;
+    border: 1px solid #d1d5db;
+    padding: 8px 10px;
+    min-width: 90px;
+    vertical-align: top;
+}
+.article-content :deep(th) {
+    background: #f3f4f6;
+    font-weight: 600;
+    color: #111827;
 }
 </style>

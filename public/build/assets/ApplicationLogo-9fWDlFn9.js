@@ -1,1 +1,0 @@
-import{c as a,o as s,Q as e}from"./app-BtfECDGA.js";const r="/images/admin-logo.png",l={__name:"ApplicationLogo",setup(c){return(o,n)=>(s(),a("img",e({src:r,alt:"Logo",class:"h-24 w-24 object-contain rounded-xl bg-gray-200 p-3 shadow-sm"},o.$attrs),null,16))}};export{l as _};
