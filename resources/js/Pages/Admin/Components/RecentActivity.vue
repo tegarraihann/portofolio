@@ -30,7 +30,7 @@
       <p class="text-gray-500">{{ emptyStateMessage }}</p>
     </div>
 
-    <div v-else class="space-y-4">
+    <div v-else class="space-y-4 max-h-80 overflow-y-auto pr-1 no-scrollbar">
       <div
         v-for="item in items"
         :key="item.id"
@@ -59,28 +59,26 @@
 
         <!-- Content -->
         <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h4 class="text-sm font-medium text-gray-900 truncate">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-medium text-gray-900 line-clamp-2 break-words">
                 {{ item.title }}
               </h4>
-              <p v-if="item.description" class="text-sm text-gray-600 mt-1">
+              <p v-if="item.description" class="text-sm text-gray-600 mt-1 line-clamp-2 break-words">
                 {{ item.description }}
               </p>
-              <div class="flex items-center mt-2 space-x-4">
-                <span class="text-xs text-gray-500">
-                  {{ formatDate(item.created_at) }}
-                </span>
+              <div class="flex flex-wrap items-center mt-2 gap-2 text-xs text-gray-500">
+                <span>{{ formatDate(item.created_at) }}</span>
                 <span
                   v-if="item.status"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                  class="inline-flex items-center px-2 py-1 rounded-full font-medium"
                   :class="getStatusBadgeColor(item.status)"
                 >
                   {{ getStatusText(item.status) }}
                 </span>
                 <span
                   v-if="item.category"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                  class="inline-flex items-center px-2 py-1 rounded-full font-medium bg-gray-100 text-gray-800"
                 >
                   {{ item.category }}
                 </span>
@@ -88,7 +86,7 @@
             </div>
 
             <!-- Action Button -->
-            <div v-if="item.action" class="ml-4">
+            <div v-if="item.action" class="flex-shrink-0">
               <Link
                 :href="item.action.url"
                 class="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
@@ -239,3 +237,13 @@ const formatDate = (dateString) => {
   })
 }
 </script>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

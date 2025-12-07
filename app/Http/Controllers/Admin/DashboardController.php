@@ -24,6 +24,12 @@ class DashboardController extends Controller
             'newMessagesToday'  => 0,
             'popularArticles'   => 0,
             'averageViews'      => $this->averageArticleViews(),
+            'trends'            => [
+                'totalArticles'   => $this->growthPercent(Article::count(), $this->previousMonthCount(Article::class)),
+                'totalProjects'   => $this->growthPercent(Project::count(), $this->previousMonthCount(Project::class)),
+                'monthlyVisitors' => $this->growthPercent($this->countMonthlyVisitors(), $this->countPreviousMonthlyVisitors()),
+                'popularArticles' => $this->growthPercent($this->popularArticlesCount(), $this->popularArticlesCount(true)),
+            ],
         ];
 
         return Inertia::render('Admin/Dashboard', [
@@ -125,5 +131,57 @@ class DashboardController extends Controller
                 $project->status = $project->is_active ? 'published' : 'draft';
                 return $project;
             });
+    }
+
+    private function previousMonthCount(string $modelClass): int
+    {
+        $start = now()->subMonthNoOverflow()->startOfMonth();
+        $end = now()->subMonthNoOverflow()->endOfMonth();
+
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = new $modelClass;
+
+        if (!method_exists($model, 'getTable')) {
+            return 0;
+        }
+
+        return $modelClass::whereBetween('created_at', [$start, $end])->count();
+    }
+
+    private function growthPercent(int $current, int $previous): int
+    {
+        if ($previous <= 0) {
+            return $current > 0 ? 100 : 0;
+        }
+
+        return (int) round((($current - $previous) / $previous) * 100);
+    }
+
+    private function countPreviousMonthlyVisitors(): int
+    {
+        $start = now()->subMonthNoOverflow()->startOfMonth();
+        $end = now()->subMonthNoOverflow()->endOfMonth();
+
+        return \DB::table('visits')
+            ->whereBetween('visited_at', [$start, $end])
+            ->selectRaw('COUNT(DISTINCT CONCAT(ip_hash, "-", session_token)) as total')
+            ->value('total') ?? 0;
+    }
+
+    private function popularArticlesCount(bool $previousMonth = false): int
+    {
+        $query = DB::table('article_views');
+
+        if ($previousMonth) {
+            $start = now()->subMonthNoOverflow()->startOfMonth();
+            $end = now()->subMonthNoOverflow()->endOfMonth();
+            $query->whereBetween('viewed_at', [$start, $end]);
+        } else {
+            $start = now()->startOfMonth();
+            $end = now()->endOfMonth();
+            $query->whereBetween('viewed_at', [$start, $end]);
+        }
+
+        return $query->count();
     }
 }

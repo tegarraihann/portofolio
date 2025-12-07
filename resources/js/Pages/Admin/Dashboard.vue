@@ -43,7 +43,7 @@
             :value="stats.totalArticles"
             icon="document"
             color="blue"
-            :trend="{ direction: 'up', value: '+12%', period: 'dari bulan lalu' }"
+            :trend="trendProps(stats.trends.totalArticles)"
           />
 
           <StatsCard
@@ -51,7 +51,7 @@
             :value="stats.totalProjects"
             icon="code"
             color="green"
-            :trend="{ direction: 'up', value: '+8%', period: 'dari bulan lalu' }"
+            :trend="trendProps(stats.trends.totalProjects)"
           />
 
           <StatsCard
@@ -59,7 +59,7 @@
             :value="stats.monthlyVisitors"
             icon="eye"
             color="purple"
-            :trend="{ direction: 'up', value: '+15%', period: 'dari bulan lalu' }"
+            :trend="trendProps(stats.trends.monthlyVisitors)"
           />
 
           <StatsCard
@@ -92,6 +92,7 @@
             :value="stats.popularArticles"
             icon="chart"
             color="green"
+            :trend="trendProps(stats.trends.popularArticles)"
           />
 
           <StatsCard
@@ -141,21 +142,16 @@
                 Lihat Semua
               </Link>
             </div>
-            <div class="space-y-4">
+            <div class="space-y-3 max-h-80 overflow-y-auto pr-2 no-scrollbar">
               <div
                 v-for="article in popularArticles"
                 :key="article.id"
-                class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                class="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition"
               >
-                <div class="flex-1">
-                  <h4 class="text-sm font-medium text-gray-900 truncate">{{ article.title }}</h4>
-                  <div class="flex items-center mt-1 space-x-4">
-                    <span class="text-xs text-gray-500">{{ article.views }} views</span>
-                    <span class="text-xs text-gray-500">{{ formatDate(article.created_at) }}</span>
-                  </div>
-                </div>
-                <div class="ml-4">
-                  <span class="text-sm font-semibold text-indigo-600">{{ article.views }}</span>
+                <h4 class="text-sm font-semibold text-gray-900 line-clamp-2 break-words mb-2">{{ article.title }}</h4>
+                <div class="flex items-center justify-between text-xs text-gray-500">
+                  <span>{{ article.views }} views</span>
+                  <span>{{ formatDate(article.created_at) }}</span>
                 </div>
               </div>
             </div>
@@ -296,7 +292,8 @@ const stats = reactive({
   draftArticles: props.stats.draftArticles ?? 0,
   totalCategories: props.stats.totalCategories ?? 0,
   popularArticles: props.stats.popularArticles ?? 0,
-  averageViews: props.stats.averageViews ?? 0
+  averageViews: props.stats.averageViews ?? 0,
+  trends: props.stats.trends ?? {}
 })
 
 const currentTrend = computed(() => props.visitTrends?.[chartPeriod.value] ?? { labels: [], total: [], unique: [] })
@@ -446,6 +443,17 @@ const engagementRate = computed(() => {
   return ((stats.averageViews / stats.monthlyVisitors) * 100).toFixed(2)
 })
 
+const trendProps = (percent) => {
+  const value = Math.abs(percent || 0)
+  const direction = percent >= 0 ? 'up' : 'down'
+  return {
+    direction,
+    value: `${value}%`,
+    unit: '',
+    period: 'dari bulan lalu'
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   loadDashboardData()
@@ -496,6 +504,14 @@ watch(chartPeriod, (newPeriod) => {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Hilangkan override dark untuk menjaga konsistensi tema terang di panel admin */

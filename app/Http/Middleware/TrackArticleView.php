@@ -22,9 +22,15 @@ class TrackArticleView
         }
 
         // Jalankan hanya pada route show artikel dengan binding model
-        $article = $request->route('articleModel');
+        $article = $request->route('article');
         if (!$article instanceof Article) {
-            return $response;
+            // fallback: coba parameter lain yang mungkin digunakan
+            $routeArticle = $request->route()?->parameter('article');
+            if ($routeArticle instanceof Article) {
+                $article = $routeArticle;
+            } else {
+                return $response;
+            }
         }
 
         // Bot/healthcheck skip
