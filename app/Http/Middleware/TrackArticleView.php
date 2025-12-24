@@ -33,6 +33,10 @@ class TrackArticleView
             }
         }
 
+        if ($article->status !== 'published') {
+            return $response;
+        }
+
         // Bot/healthcheck skip
         $userAgent = (string) $request->userAgent();
         if ($this->isBot($userAgent)) {
