@@ -110,6 +110,12 @@
               {{ isSubmitting ? 'Sending...' : 'Subscribe' }}
             </button>
           </form>
+          <p v-if="successMessage" class="mt-4 text-sm text-emerald-200">
+            {{ successMessage }}
+          </p>
+          <p v-if="errorMessage" class="mt-4 text-sm text-red-200">
+            {{ errorMessage }}
+          </p>
         </div>
       </div>
 
@@ -161,38 +167,41 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import axios from 'axios'
 
 const email = ref('')
 const isSubmitting = ref(false)
+const successMessage = ref('')
+const errorMessage = ref('')
 
 const currentYear = computed(() => new Date().getFullYear())
 
 const socialLinks = [
   {
     name: 'GitHub',
-    url: 'https://github.com/tegarahmali',
-    icon: 'fab fa-github',
+    url: 'https://github.com/tegarraihann',
+    icon: 'fa-brands fa-github',
     bgColor: 'bg-gray-700/50',
     hoverColor: 'hover:bg-gray-700'
   },
   {
     name: 'LinkedIn',
-    url: 'https://linkedin.com/in/tegarahmali',
-    icon: 'fab fa-linkedin-in',
+    url: 'https://linkedin.com/in/tegarraihann',
+    icon: 'fa-brands fa-linkedin-in',
     bgColor: 'bg-blue-600/50',
     hoverColor: 'hover:bg-blue-600'
   },
   {
     name: 'Instagram',
-    url: 'https://instagram.com/tegarahmali',
-    icon: 'fab fa-instagram',
+    url: 'https://instagram.com/tegarraihann.a',
+    icon: 'fa-brands fa-instagram',
     bgColor: 'bg-pink-600/50',
     hoverColor: 'hover:bg-pink-600'
   },
   {
     name: 'Twitter',
-    url: 'https://twitter.com/tegarahmali',
-    icon: 'fab fa-twitter',
+    url: 'https://twitter.com/',
+    icon: 'fa-brands fa-x-twitter',
     bgColor: 'bg-blue-400/50',
     hoverColor: 'hover:bg-blue-400'
   }
@@ -231,20 +240,21 @@ const handleNewsletterSubmit = async () => {
   if (!email.value) return
 
   isSubmitting.value = true
+  successMessage.value = ''
+  errorMessage.value = ''
 
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    const subscribeUrl = typeof route === 'function'
+      ? route('newsletter.subscribe')
+      : '/newsletter/subscribe'
 
-    // Here you would typically send the email to your backend
-    console.log('Newsletter subscription:', email.value)
-
-    // Reset form
+    const response = await axios.post(subscribeUrl, { email: email.value })
+    successMessage.value = response?.data?.message || 'Terima kasih! Anda berhasil subscribe newsletter.'
     email.value = ''
-    alert('Terima kasih! Anda berhasil subscribe newsletter.')
   } catch (error) {
-    console.error('Newsletter subscription failed:', error)
-    alert('Terjadi kesalahan. Silakan coba lagi.')
+    errorMessage.value = error?.response?.data?.errors?.email?.[0]
+      || error?.response?.data?.message
+      || 'Terjadi kesalahan. Silakan coba lagi.'
   } finally {
     isSubmitting.value = false
   }

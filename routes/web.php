@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\CvController;
 use App\Http\Controllers\Admin\SeoController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Middleware\TrackArticleView;
+use App\Http\Controllers\NewsletterController as PublicNewsletterController;
+use App\Http\Controllers\Admin\NewsletterController as AdminNewsletterController;
 
 Route::middleware(['auth','verified'])
     ->prefix('admin')
@@ -60,6 +62,11 @@ Route::middleware(['auth','verified'])
         Route::get('media', [MediaController::class, 'index'])->name('media.index');
         Route::post('media', [MediaController::class, 'store'])->name('media.store');
         Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+
+        // Newsletter management
+        Route::get('newsletter', [AdminNewsletterController::class, 'index'])->name('newsletter.index');
+        Route::post('newsletter/send', [AdminNewsletterController::class, 'send'])->name('newsletter.send');
+        Route::delete('newsletter/{subscriber}', [AdminNewsletterController::class, 'destroy'])->name('newsletter.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -79,6 +86,9 @@ Route::get('/articles', [ArticlePublicController::class, 'index'])
 Route::get('/articles/{article:slug}', [ArticlePublicController::class, 'show'])
      ->middleware(TrackArticleView::class)
      ->name('articles.show');
+
+Route::post('/newsletter/subscribe', [PublicNewsletterController::class, 'subscribe'])
+     ->name('newsletter.subscribe');
 
 Route::get('/test-purifier', function () {
     $dirty_html = '<script>alert("XSS Attack!")</script><p>This is clean content</p><img src="x" onerror="alert(\'hack\')">';
