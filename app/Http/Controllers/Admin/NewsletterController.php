@@ -58,7 +58,7 @@ class NewsletterController extends Controller
         $sent = 0;
 
         NewsletterSubscriber::where('status', 'active')
-            ->select('email')
+            ->select(['id', 'email'])
             ->chunkById(200, function ($subscribers) use (&$sent, $data) {
                 foreach ($subscribers as $subscriber) {
                     Mail::raw($data['content'], function ($message) use ($subscriber, $data) {
