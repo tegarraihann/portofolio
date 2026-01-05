@@ -81,7 +81,7 @@
                     <div v-for="project in filteredProjects" :key="project.id"
                         class="bg-white border rounded-xl p-4 hover:shadow transition">
                         <div class="relative h-40 bg-gray-100 flex items-center justify-center mb-4">
-                            <img v-if="project.thumbnail" :src="`/storage/${project.thumbnail}`" alt=""
+                            <img v-if="project.thumbnail_url" :src="project.thumbnail_url" alt=""
                                 class="w-full h-full object-cover" />
                             <div v-if="project.is_featured"
                                 class="absolute top-2 left-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded-full font-semibold shadow">

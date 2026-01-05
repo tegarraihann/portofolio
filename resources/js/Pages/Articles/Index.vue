@@ -52,8 +52,8 @@
             <!-- Thumbnail -->
             <div class="relative overflow-hidden">
               <div class="aspect-w-16 aspect-h-9">
-                <img v-if="post.thumbnail_path"
-                  :src="`/storage/${post.thumbnail_path}`"
+                <img v-if="post.thumbnail_url"
+                  :src="post.thumbnail_url"
                   :alt="post.title"
                   class="w-full h-48 sm:h-52 object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div v-else class="w-full h-48 sm:h-52 bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center">

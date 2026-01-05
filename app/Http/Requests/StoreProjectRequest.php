@@ -27,7 +27,7 @@ class StoreProjectRequest extends FormRequest
             'category' => ['required', 'string'],
             'tech_stack' => ['required', 'array'],
             'tech_stack.*' => ['string'],
-            'thumbnail' => ['nullable', 'image'],
+            'thumbnail_media_id' => ['nullable', 'exists:media,id'],
             'live_demo_url' => ['nullable', 'url'],
             'github_url' => ['nullable', 'url'],
             'is_featured' => ['nullable', 'boolean'],

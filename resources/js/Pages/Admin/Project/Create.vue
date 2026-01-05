@@ -40,7 +40,17 @@
             <!-- Thumbnail -->
             <div>
                 <label class="block font-medium mb-1">Thumbnail</label>
-                <input type="file" @change="handleThumbnail" class="block w-full" />
+                <div v-if="selectedThumbnailUrl" class="mb-2">
+                    <img :src="selectedThumbnailUrl" alt="Thumbnail"
+                        class="h-32 w-32 rounded object-cover border border-gray-200" />
+                </div>
+                <select v-model="form.thumbnail_media_id" class="w-full border rounded px-4 py-2">
+                    <option value="">Pilih dari Media Library</option>
+                    <option v-for="item in media" :key="item.id" :value="item.id">{{ item.original_name }}</option>
+                </select>
+                <div v-if="form.errors.thumbnail_media_id" class="text-red-600 text-sm mt-1">
+                    {{ form.errors.thumbnail_media_id }}
+                </div>
             </div>
 
             <!-- Live Demo URL -->
@@ -72,22 +82,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useForm, router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import { useForm, usePage } from '@inertiajs/vue3'
 import Swal from 'sweetalert2'
+
+const { props } = usePage()
+const { media } = props
 
 const form = useForm({
     title: '',
     description: '',
     category: '',
     tech_stack: [],
-    thumbnail: null,
+    thumbnail_media_id: '',
     live_demo_url: '',
     github_url: '',
     is_featured: false,
 })
 
 const techInput = ref('')
+
+const selectedThumbnailUrl = computed(() => {
+    if (!form.thumbnail_media_id) return ''
+    const selected = media?.find((item) => String(item.id) === String(form.thumbnail_media_id))
+    return selected?.url || ''
+})
 
 function addTech() {
   if (techInput.value.trim() !== '') {
@@ -102,14 +121,9 @@ function removeTech(index) {
     form.tech_stack.splice(index, 1)
 }
 
-function handleThumbnail(event) {
-    form.thumbnail = event.target.files[0]
-}
-
 function submitForm() {
     console.log('Tech Stack to submit:', form.tech_stack)
     form.post(route('admin.projects.store'), {
-        forceFormData: true,
         onSuccess: () => {
             Swal.fire({
                 toast: true,

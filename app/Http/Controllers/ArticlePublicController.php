@@ -66,18 +66,28 @@ class ArticlePublicController extends Controller
 
         $article->load(['category', 'tags']);
 
+        $descriptionSource = $article->meta_description ?: ($article->excerpt ?: $article->content);
+        $description = trim(preg_replace('/\s+/', ' ', strip_tags($descriptionSource)));
+        $description = mb_substr($description, 0, 160);
+
         $metaData = [
-            'title' => $article->title,
-            'description' => $article->excerpt ?: strip_tags(substr($article->content, 0, 160)),
-            'image' => $article->thumbnail_path ? asset('storage/' . ltrim($article->thumbnail_path, '/')) : null,
+            'title' => $article->meta_title ?: $article->title,
+            'description' => $description,
+            'image' => $article->thumbnail_url,
             'url' => request()->url(),
             'type' => 'article',
-            'site_name' => config('app.name')
+            'site_name' => config('app.name'),
+            'published_time' => optional($article->created_at)->toISOString(),
+            'modified_time' => optional($article->updated_at)->toISOString(),
+            'section' => optional($article->category)->name,
+            'tags' => $article->tags->pluck('name')->all(),
         ];
 
         return Inertia::render('Articles/Show', [
             'article' => $article,
             'metaData' => $metaData
+        ])->withViewData([
+            'meta' => $metaData,
         ]);
 
     }

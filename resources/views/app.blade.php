@@ -9,47 +9,52 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        {{-- Open Graph Meta Tags untuk Article Pages --}}
-        @if(Route::is('articles.show'))
-            @php
-                $slug = request()->segment(2);
-                $article = \App\Models\Article::where('slug', $slug)->where('status', 'published')->first();
-            @endphp
-            @if($article)
-                {{-- Basic Meta Tags --}}
-                <meta name="description" content="{{ $article->excerpt ?: strip_tags(substr($article->content, 0, 160)) }}">
+        {{-- Open Graph Meta Tags --}}
+        @php
+            $meta = $meta ?? null;
+        @endphp
+        @if(!empty($meta))
+            {{-- Basic Meta Tags --}}
+            <meta name="description" content="{{ $meta['description'] ?? '' }}">
 
-                {{-- Open Graph / Facebook --}}
-                <meta property="og:type" content="article">
-                <meta property="og:url" content="{{ request()->url() }}">
-                <meta property="og:title" content="{{ $article->title }}">
-                <meta property="og:description" content="{{ $article->excerpt ?: strip_tags(substr($article->content, 0, 160)) }}">
-                <meta property="og:site_name" content="{{ config('app.name') }}">
-                @if($article->thumbnail_path)
-                    <meta property="og:image" content="{{ asset('storage/' . ltrim($article->thumbnail_path, '/')) }}">
-                    <meta property="og:image:type" content="image/jpeg">
-                    <meta property="og:image:width" content="1200">
-                    <meta property="og:image:height" content="630">
+            {{-- Open Graph / Facebook --}}
+            <meta property="og:type" content="{{ $meta['type'] ?? 'website' }}">
+            <meta property="og:url" content="{{ $meta['url'] ?? request()->url() }}">
+            <meta property="og:title" content="{{ $meta['title'] ?? config('app.name') }}">
+            <meta property="og:description" content="{{ $meta['description'] ?? '' }}">
+            <meta property="og:site_name" content="{{ $meta['site_name'] ?? config('app.name') }}">
+            @if(!empty($meta['image']))
+                <meta property="og:image" content="{{ $meta['image'] }}">
+                @if(!empty($meta['image_type']))
+                    <meta property="og:image:type" content="{{ $meta['image_type'] }}">
                 @endif
+                <meta property="og:image:width" content="{{ $meta['image_width'] ?? 1200 }}">
+                <meta property="og:image:height" content="{{ $meta['image_height'] ?? 630 }}">
+            @endif
 
-                {{-- Twitter Cards --}}
-                <meta name="twitter:card" content="summary_large_image">
-                <meta name="twitter:url" content="{{ request()->url() }}">
-                <meta name="twitter:title" content="{{ $article->title }}">
-                <meta name="twitter:description" content="{{ $article->excerpt ?: strip_tags(substr($article->content, 0, 160)) }}">
-                @if($article->thumbnail_path)
-                    <meta name="twitter:image" content="{{ asset('storage/' . ltrim($article->thumbnail_path, '/')) }}">
-                @endif
+            {{-- Twitter Cards --}}
+            <meta name="twitter:card" content="{{ !empty($meta['image']) ? 'summary_large_image' : 'summary' }}">
+            <meta name="twitter:url" content="{{ $meta['url'] ?? request()->url() }}">
+            <meta name="twitter:title" content="{{ $meta['title'] ?? config('app.name') }}">
+            <meta name="twitter:description" content="{{ $meta['description'] ?? '' }}">
+            @if(!empty($meta['image']))
+                <meta name="twitter:image" content="{{ $meta['image'] }}">
+            @endif
 
-                {{-- Article Specific Meta --}}
-                <meta property="article:published_time" content="{{ $article->created_at->toISOString() }}">
-                <meta property="article:modified_time" content="{{ $article->updated_at->toISOString() }}">
-                @if($article->category)
-                    <meta property="article:section" content="{{ $article->category->name }}">
+            {{-- Article Specific Meta --}}
+            @if(($meta['type'] ?? null) === 'article')
+                @if(!empty($meta['published_time']))
+                    <meta property="article:published_time" content="{{ $meta['published_time'] }}">
                 @endif
-                @if($article->tags && $article->tags->count() > 0)
-                    @foreach($article->tags as $tag)
-                        <meta property="article:tag" content="{{ $tag->name }}">
+                @if(!empty($meta['modified_time']))
+                    <meta property="article:modified_time" content="{{ $meta['modified_time'] }}">
+                @endif
+                @if(!empty($meta['section']))
+                    <meta property="article:section" content="{{ $meta['section'] }}">
+                @endif
+                @if(!empty($meta['tags']))
+                    @foreach($meta['tags'] as $tag)
+                        <meta property="article:tag" content="{{ $tag }}">
                     @endforeach
                 @endif
             @endif

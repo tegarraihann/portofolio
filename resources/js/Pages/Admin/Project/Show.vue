@@ -26,7 +26,7 @@
 
         <div class="bg-white rounded-lg shadow p-6 space-y-4">
           <div class="w-full h-60 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-            <img v-if="project.thumbnail" :src="`/storage/${project.thumbnail}`" alt="Thumbnail" class="w-full h-full object-cover" />
+            <img v-if="project.thumbnail_url" :src="project.thumbnail_url" alt="Thumbnail" class="w-full h-full object-cover" />
             <span v-else class="text-gray-400 text-sm">Tidak ada thumbnail</span>
           </div>
 

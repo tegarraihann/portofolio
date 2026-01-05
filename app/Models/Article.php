@@ -17,6 +17,7 @@ class Article extends Model
         'content',
         'status',
         'thumbnail_path',
+        'thumbnail_media_id',
         'meta_title',
         'meta_description',
         'meta_image',
@@ -28,9 +29,20 @@ class Article extends Model
     protected $casts = [
         'noindex' => 'boolean',
     ];
+
     public function getThumbnailUrlAttribute()
     {
+        $mediaUrl = optional($this->thumbnailMedia)->url;
+        if ($mediaUrl) {
+            return url($mediaUrl);
+        }
+
         return $this->thumbnail_path ? asset('storage/' . ltrim($this->thumbnail_path, '/')) : null;
+    }
+
+    public function thumbnailMedia()
+    {
+        return $this->belongsTo(Media::class, 'thumbnail_media_id');
     }
 
     public function category()

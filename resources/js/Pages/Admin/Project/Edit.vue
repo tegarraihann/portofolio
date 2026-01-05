@@ -80,12 +80,17 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Thumbnail</label>
-              <input type="file" @change="handleThumbnail" class="block w-full text-sm text-gray-700" />
-              <p class="text-xs text-gray-500 mt-1">Opsional: upload untuk mengganti thumbnail.</p>
+              <select v-model="form.thumbnail_media_id" class="w-full border rounded px-3 py-2 focus:ring focus:ring-indigo-200">
+                <option value="">Pilih dari Media Library</option>
+                <option v-for="item in media" :key="item.id" :value="item.id">{{ item.original_name }}</option>
+              </select>
+              <div v-if="form.errors.thumbnail_media_id" class="text-red-600 text-sm mt-1">
+                {{ form.errors.thumbnail_media_id }}
+              </div>
             </div>
             <div class="flex items-center">
               <div class="w-full h-28 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
-                <img v-if="project.thumbnail" :src="`/storage/${project.thumbnail}`" alt="Thumbnail" class="w-full h-full object-cover" />
+                <img v-if="selectedThumbnailUrl" :src="selectedThumbnailUrl" alt="Thumbnail" class="w-full h-full object-cover" />
                 <span v-else class="text-gray-400 text-sm">Tidak ada thumbnail</span>
               </div>
             </div>
@@ -103,8 +108,8 @@
 </template>
 
 <script setup>
-import { Link, useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { Link, useForm, usePage } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
 import Swal from 'sweetalert2'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
@@ -116,6 +121,9 @@ const props = defineProps({
   }
 })
 
+const { props: pageProps } = usePage()
+const { media } = pageProps
+
 const techInput = ref('')
 
 const form = useForm({
@@ -123,7 +131,7 @@ const form = useForm({
   description: props.project?.description ?? '',
   category: props.project?.category ?? '',
   tech_stack: props.project?.tech_stack ?? [],
-  thumbnail: null,
+  thumbnail_media_id: props.project?.thumbnail_media_id ?? '',
   live_demo_url: props.project?.live_demo_url ?? '',
   github_url: props.project?.github_url ?? '',
   is_featured: !!props.project?.is_featured,
@@ -132,6 +140,14 @@ const form = useForm({
 })
 
 const project = props.project
+
+const selectedThumbnailUrl = computed(() => {
+  if (form.thumbnail_media_id) {
+    const selected = media?.find((item) => String(item.id) === String(form.thumbnail_media_id))
+    return selected?.url || ''
+  }
+  return project?.thumbnail_url || ''
+})
 
 function addTech() {
   if (!techInput.value.trim()) return
@@ -144,20 +160,12 @@ function removeTech(index) {
   form.tech_stack.splice(index, 1)
 }
 
-function handleThumbnail(event) {
-  form.thumbnail = event.target.files[0]
-}
-
 function submit() {
-  form.transform(data => {
-    const payload = { ...data, _method: 'put' }
-    if (!data.thumbnail) {
-      delete payload.thumbnail
-    }
-    return payload
-  })
+  form.transform(data => ({
+    ...data,
+    _method: 'put',
+  }))
   form.post(route('admin.projects.update', project.id), {
-    forceFormData: true,
     preserveScroll: true,
     onSuccess: () => {
       Swal.fire({
@@ -174,12 +182,6 @@ function submit() {
         icon: 'error',
         title: 'Gagal',
         text: 'Periksa kembali input Anda.',
-      })
-    },
-    onFinish: () => {
-      form.transform(data => {
-        const { _method, ...rest } = data
-        return rest
       })
     },
   })

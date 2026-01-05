@@ -44,8 +44,8 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10"></div>
 
             <img
-              v-if="article.thumbnail_path"
-              :src="`/storage/${article.thumbnail_path}`"
+              v-if="article.thumbnail_url"
+              :src="article.thumbnail_url"
               :alt="article.title"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />

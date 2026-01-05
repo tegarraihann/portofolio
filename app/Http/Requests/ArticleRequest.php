@@ -27,7 +27,7 @@ class ArticleRequest extends FormRequest
             'excerpt'      => 'nullable|string',
             'content'      => 'required|string',
             'status'       => 'required|in:draft,published',
-            'thumbnail'    => 'nullable|image|max:2048',
+            'thumbnail_media_id' => 'nullable|exists:media,id',
             'tags'         => 'nullable|array',
             'tags.*'       => 'exists:tags,id',
             'meta_title'       => 'nullable|string|max:60',
@@ -45,7 +45,7 @@ class ArticleRequest extends FormRequest
             'excerpt'     => 'ringkasan',
             'content'     => 'konten',
             'status'      => 'status',
-            'thumbnail'   => 'gambar thumbnail',
+            'thumbnail_media_id'   => 'thumbnail',
             'tags'        => 'tag',
         ];
     }
@@ -56,7 +56,7 @@ class ArticleRequest extends FormRequest
             'title.required'   => 'Judul artikel wajib diisi.',
             'content.required' => 'Konten artikel wajib diisi.',
             'status.in'        => 'Status harus bernilai draft atau published.',
-            'thumbnail.image'  => 'Thumbnail harus berupa file gambar.',
+            'thumbnail_media_id.exists'  => 'Thumbnail yang dipilih tidak valid.',
             'tags.*.exists'    => 'Tag yang dipilih tidak valid.',
         ];
     }

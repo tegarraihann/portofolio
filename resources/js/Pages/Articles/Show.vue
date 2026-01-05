@@ -82,8 +82,8 @@
                 </div>
 
                 <!-- Thumbnail -->
-                <div v-if="article.thumbnail_path" class="mb-8">
-                    <img :src="getThumbnailUrl(article.thumbnail_path)" :alt="article.title"
+                <div v-if="article.thumbnail_url" class="mb-8">
+                    <img :src="article.thumbnail_url" :alt="article.title"
                         class="w-full h-64 md:h-96 object-cover rounded-xl shadow-lg" @error="handleImageError" />
                 </div>
             </header>
@@ -196,11 +196,6 @@ const formatDate = (dateString) => {
         month: 'long',
         day: 'numeric'
     });
-};
-
-const getThumbnailUrl = (path) => {
-    if (!path) return '';
-    return path.startsWith('/') ? `/storage${path}` : `/storage/${path}`;
 };
 
 const handleImageError = (event) => {

@@ -41,8 +41,17 @@
                     <!-- Thumbnail -->
                     <div>
                         <label class="block text-gray-700">Thumbnail</label>
-                        <input @change="onFileChange" type="file" class="mt-1 block w-full text-gray-700" />
-                        <div v-if="form.errors.thumbnail" class="text-red-600 text-sm mt-1">{{ form.errors.thumbnail }}
+                        <div v-if="selectedThumbnailUrl" class="mb-2">
+                            <img :src="selectedThumbnailUrl" alt="Thumbnail"
+                                class="h-32 w-32 rounded object-cover border border-gray-200" />
+                        </div>
+                        <select v-model="form.thumbnail_media_id"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500">
+                            <option value="">-- Pilih dari Media Library --</option>
+                            <option v-for="item in media" :key="item.id" :value="item.id">{{ item.original_name }}</option>
+                        </select>
+                        <div v-if="form.errors.thumbnail_media_id" class="text-red-600 text-sm mt-1">
+                            {{ form.errors.thumbnail_media_id }}
                         </div>
                     </div>
 
@@ -94,16 +103,15 @@
 </template>
 
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3'
+import { useForm, Link, usePage } from '@inertiajs/vue3'
 import AdminSidebar from '../Components/AdminSidebar.vue'
 import AdminNavbar from '../Components/AdminNavbar.vue'
-import { ref } from 'vue'
-import { usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import RichTextEditor from '@/Components/RichTextEditor.vue'
 import Swal from 'sweetalert2'
 
 const { props } = usePage()
-const { categories, tags } = props
+const { categories, tags, media } = props
 
 const form = useForm({
     title: '',
@@ -112,16 +120,17 @@ const form = useForm({
     excerpt: '',
     content: '',
     status: 'draft',
-    thumbnail: null,
+    thumbnail_media_id: '',
 })
 
-function onFileChange(event) {
-    form.thumbnail = event.target.files[0]
-}
+const selectedThumbnailUrl = computed(() => {
+    if (!form.thumbnail_media_id) return ''
+    const selected = media?.find((item) => String(item.id) === String(form.thumbnail_media_id))
+    return selected?.url || ''
+})
 
 function submit() {
     form.post(route('admin.articles.store'), {
-        forceFormData: true,
         onSuccess: () => {
             Swal.fire({
                 toast: true,

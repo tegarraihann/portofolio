@@ -82,8 +82,8 @@ const filterProjects = (category) => {
         >
           <div class="relative h-48 overflow-hidden">
             <img
-              v-if="project.thumbnail"
-              :src="`/storage/${project.thumbnail}`"
+              v-if="project.thumbnail_url"
+              :src="project.thumbnail_url"
               alt="Project Thumbnail"
               class="w-full h-full object-cover"
             />

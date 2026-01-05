@@ -57,6 +57,16 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-100">
                                     <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                                            <input
+                                                type="checkbox"
+                                                :checked="allSelectedOnPage"
+                                                :disabled="activeIdsOnPage.length === 0"
+                                                @change="toggleAllOnPage"
+                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+                                                title="Pilih semua subscriber aktif di halaman ini"
+                                            >
+                                        </th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subscribed</th>
@@ -64,7 +74,26 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="subscriber in subscribers.data" :key="subscriber.id">
+                                    <tr
+                                        v-for="subscriber in subscribers.data"
+                                        :key="subscriber.id"
+                                        @click="toggleSelection(subscriber)"
+                                        :class="[
+                                            subscriber.status === 'active' ? 'cursor-pointer hover:bg-gray-50' : 'cursor-not-allowed opacity-70',
+                                            selectedIds.includes(subscriber.id) ? 'bg-indigo-50' : ''
+                                        ]"
+                                    >
+                                        <td class="px-4 py-4">
+                                            <input
+                                                v-model="selectedIds"
+                                                type="checkbox"
+                                                :value="subscriber.id"
+                                                :disabled="subscriber.status !== 'active'"
+                                                @click.stop
+                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+                                                :title="subscriber.status !== 'active' ? 'Hanya subscriber aktif yang bisa dipilih' : 'Pilih subscriber'"
+                                            >
+                                        </td>
                                         <td class="px-6 py-4 text-gray-800">{{ subscriber.email }}</td>
                                         <td class="px-6 py-4">
                                             <span
@@ -83,6 +112,7 @@
                                             <button
                                                 type="button"
                                                 @click="remove(subscriber.id)"
+                                                @click.stop
                                                 class="text-red-600 hover:text-red-900 text-sm"
                                             >
                                                 Hapus
@@ -119,37 +149,133 @@
 
                         <div class="bg-white rounded-xl shadow p-6">
                             <h2 class="text-lg font-semibold text-gray-900 mb-4">Kirim Newsletter</h2>
-                            <form @submit.prevent="send" class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
-                                    <input
-                                        v-model="form.subject"
-                                        type="text"
-                                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                        placeholder="Update terbaru"
+                            <form @submit.prevent="send('all')" class="space-y-4">
+                                <p class="text-sm text-gray-600">
+                                    Pilih satu artikel atau project yang ingin dikirim. Email menggunakan template HTML otomatis.
+                                </p>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="text-sm font-semibold text-gray-800 mb-2">Artikel Terbaru</div>
+                                        <div v-if="articles.length === 0" class="text-xs text-gray-500">
+                                            Belum ada artikel yang dapat dikirim.
+                                        </div>
+                                        <div v-else class="space-y-2">
+                                            <label
+                                                v-for="article in articles"
+                                                :key="`article-${article.id}`"
+                                                class="flex items-start gap-3 rounded-lg border px-3 py-2 cursor-pointer transition"
+                                                :class="form.item_type === 'article' && form.item_id === article.id
+                                                    ? 'border-indigo-500 bg-indigo-50'
+                                                    : 'border-gray-200 hover:border-indigo-300'"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="newsletter-item"
+                                                    class="mt-1 text-indigo-600 focus:ring-indigo-500"
+                                                    :checked="form.item_type === 'article' && form.item_id === article.id"
+                                                    @change="selectItem('article', article)"
+                                                >
+                                                <div class="flex items-start gap-3 flex-1">
+                                                    <div
+                                                        v-if="article.thumbnail_url"
+                                                        class="h-10 w-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0"
+                                                    >
+                                                        <img
+                                                            :src="article.thumbnail_url"
+                                                            :alt="article.title"
+                                                            class="h-full w-full object-cover"
+                                                        >
+                                                    </div>
+                                                    <div class="space-y-1">
+                                                        <div class="text-sm font-semibold text-gray-900">
+                                                            {{ article.title }}
+                                                        </div>
+                                                        <div v-if="article.excerpt" class="text-xs text-gray-600">
+                                                            {{ article.excerpt }}
+                                                        </div>
+                                                        <div v-if="article.date" class="text-xs text-gray-400">
+                                                            {{ article.date }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-sm font-semibold text-gray-800 mb-2">Project Terbaru</div>
+                                        <div v-if="projects.length === 0" class="text-xs text-gray-500">
+                                            Belum ada project yang dapat dikirim.
+                                        </div>
+                                        <div v-else class="space-y-2">
+                                            <label
+                                                v-for="project in projects"
+                                                :key="`project-${project.id}`"
+                                                class="flex items-start gap-3 rounded-lg border px-3 py-2 cursor-pointer transition"
+                                                :class="form.item_type === 'project' && form.item_id === project.id
+                                                    ? 'border-indigo-500 bg-indigo-50'
+                                                    : 'border-gray-200 hover:border-indigo-300'"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="newsletter-item"
+                                                    class="mt-1 text-indigo-600 focus:ring-indigo-500"
+                                                    :checked="form.item_type === 'project' && form.item_id === project.id"
+                                                    @change="selectItem('project', project)"
+                                                >
+                                                <div class="flex items-start gap-3 flex-1">
+                                                    <div
+                                                        v-if="project.thumbnail_url"
+                                                        class="h-10 w-10 rounded-md overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0"
+                                                    >
+                                                        <img
+                                                            :src="project.thumbnail_url"
+                                                            :alt="project.title"
+                                                            class="h-full w-full object-cover"
+                                                        >
+                                                    </div>
+                                                    <div class="space-y-1">
+                                                        <div class="text-sm font-semibold text-gray-900">
+                                                            {{ project.title }}
+                                                        </div>
+                                                        <div v-if="project.excerpt" class="text-xs text-gray-600">
+                                                            {{ project.excerpt }}
+                                                        </div>
+                                                        <div v-if="project.date" class="text-xs text-gray-400">
+                                                            {{ project.date }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    <span v-if="hasSelectedItem">
+                                        Konten terpilih: <span class="font-semibold text-gray-700">{{ selectedItemTitle }}</span>
+                                    </span>
+                                    <span v-else>Belum ada konten yang dipilih.</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <button
+                                        type="button"
+                                        @click="send('selected')"
+                                        :disabled="form.processing || selectedCount === 0 || !hasSelectedItem"
+                                        class="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow hover:bg-indigo-600 transition disabled:opacity-50"
                                     >
-                                    <p v-if="form.errors.subject" class="text-sm text-red-600 mt-1">{{ form.errors.subject }}</p>
+                                        {{ form.processing ? 'Mengirim...' : 'Kirim ke Pilihan' }}
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        :disabled="form.processing || !hasSelectedItem"
+                                        class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition disabled:opacity-50"
+                                    >
+                                        {{ form.processing ? 'Mengirim...' : 'Kirim ke Semua Subscriber Aktif' }}
+                                    </button>
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Konten</label>
-                                    <textarea
-                                        v-model="form.content"
-                                        rows="6"
-                                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                        placeholder="Tulis pesan newsletter..."
-                                    ></textarea>
-                                    <p v-if="form.errors.content" class="text-sm text-red-600 mt-1">{{ form.errors.content }}</p>
-                                </div>
-                                <button
-                                    type="submit"
-                                    :disabled="form.processing"
-                                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow hover:bg-indigo-700 transition disabled:opacity-50"
-                                >
-                                    {{ form.processing ? 'Mengirim...' : 'Kirim ke Subscriber Aktif' }}
-                                </button>
                             </form>
                             <p class="text-xs text-gray-500 mt-3">
-                                Newsletter akan dikirim ke semua subscriber dengan status active.
+                                Terpilih {{ selectedCount }} subscriber aktif. Gunakan tombol "Kirim ke Pilihan" untuk mengirim sebagian.
                             </p>
                         </div>
                     </div>
@@ -171,18 +297,41 @@ const props = defineProps({
     subscribers: Object,
     filters: Object,
     stats: Object,
+    articles: Array,
+    projects: Array,
 })
 
 const search = ref(props.filters?.q || '')
 const status = ref(props.filters?.status || '')
 
 const form = useForm({
-    subject: '',
-    content: '',
+    item_type: '',
+    item_id: null,
+    scope: 'all',
+    subscriber_ids: [],
 })
 
 const page = usePage()
 const statusMessage = computed(() => page.props.flash?.status || '')
+const selectedIds = ref([])
+
+const activeIdsOnPage = computed(() =>
+    props.subscribers.data.filter((subscriber) => subscriber.status === 'active').map((subscriber) => subscriber.id)
+)
+
+const allSelectedOnPage = computed(() => {
+    if (activeIdsOnPage.value.length === 0) return false
+    return activeIdsOnPage.value.every((id) => selectedIds.value.includes(id))
+})
+
+const selectedCount = computed(() => selectedIds.value.length)
+const hasSelectedItem = computed(() => form.item_type !== '' && form.item_id !== null)
+const selectedItemTitle = computed(() => {
+    if (!hasSelectedItem.value) return ''
+    const list = form.item_type === 'article' ? props.articles : props.projects
+    const item = list.find((entry) => entry.id === form.item_id)
+    return item?.title || ''
+})
 
 const applyFilter = () => {
     router.get(
@@ -192,13 +341,52 @@ const applyFilter = () => {
     )
 }
 
-const send = () => {
+const send = (scope) => {
+    if (!hasSelectedItem.value) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Pilih konten',
+            text: 'Silakan pilih satu artikel atau project sebelum mengirim newsletter.',
+        })
+        return
+    }
+    form.scope = scope
+    form.subscriber_ids = scope === 'selected' ? [...selectedIds.value] : []
     form.post(route('admin.newsletter.send'), {
         preserveScroll: true,
         onSuccess: () => {
-            form.reset('subject', 'content')
+            form.reset('scope', 'subscriber_ids')
+            selectedIds.value = []
         },
     })
+}
+
+const selectItem = (type, item) => {
+    form.item_type = type
+    form.item_id = item.id
+}
+
+const toggleAllOnPage = () => {
+    if (allSelectedOnPage.value) {
+        selectedIds.value = selectedIds.value.filter((id) => !activeIdsOnPage.value.includes(id))
+        return
+    }
+
+    const next = new Set(selectedIds.value)
+    activeIdsOnPage.value.forEach((id) => next.add(id))
+    selectedIds.value = Array.from(next)
+}
+
+const toggleSelection = (subscriber) => {
+    if (subscriber.status !== 'active') return
+
+    const id = subscriber.id
+    if (selectedIds.value.includes(id)) {
+        selectedIds.value = selectedIds.value.filter((selectedId) => selectedId !== id)
+        return
+    }
+
+    selectedIds.value = [...selectedIds.value, id]
 }
 
 const remove = (id) => {

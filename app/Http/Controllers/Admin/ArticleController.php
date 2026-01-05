@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\Category;
+use App\Models\Media;
 use App\Models\Tag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -37,6 +38,9 @@ class ArticleController extends Controller
         return Inertia::render('Admin/Articles/Create', [
             'categories' => Category::orderBy('name')->get(),
             'tags'       => Tag::orderBy('name')->get(),
+            'media'      => Media::where('type', 'image')
+                ->latest()
+                ->get(['id', 'original_name', 'path', 'disk']),
         ]);
     }
 
@@ -52,12 +56,6 @@ class ArticleController extends Controller
 
         // Generate unique slug
         $data['slug'] = $this->generateUniqueSlug($data['title']);
-
-        // Simpan thumbnail jika ada
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail_path'] = $request->file('thumbnail')
-                                          ->store('articles', 'public');
-        }
 
         // Create article
         $article = Article::create($data);
@@ -95,6 +93,9 @@ class ArticleController extends Controller
             'article'    => $article,
             'categories' => Category::orderBy('name')->get(),
             'tags'       => Tag::orderBy('name')->get(),
+            'media'      => Media::where('type', 'image')
+                ->latest()
+                ->get(['id', 'original_name', 'path', 'disk']),
         ]);
     }
 
@@ -111,16 +112,6 @@ class ArticleController extends Controller
         // Jika judul berubah, regenerate unique slug
         if ($article->title !== $data['title']) {
             $data['slug'] = $this->generateUniqueSlug($data['title'], $article->id);
-        }
-
-        // Handle thumbnail baru
-        if ($request->hasFile('thumbnail')) {
-            // Hapus file lama jika ada
-            if ($article->thumbnail_path) {
-                Storage::disk('public')->delete($article->thumbnail_path);
-            }
-            $data['thumbnail_path'] = $request->file('thumbnail')
-                                          ->store('articles', 'public');
         }
 
         // Update artikel
@@ -140,11 +131,6 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         try {
-            // Hapus thumbnail
-            if ($article->thumbnail_path) {
-                Storage::disk('public')->delete($article->thumbnail_path);
-            }
-
             // Hapus relasi tags (pivot table)
             $article->tags()->detach();
 
@@ -244,14 +230,6 @@ class ArticleController extends Controller
 
         switch ($request->action) {
             case 'delete':
-                // Hapus thumbnail files
-                $articlesToDelete = $articles->get();
-                foreach ($articlesToDelete as $article) {
-                    if ($article->thumbnail_path) {
-                        Storage::disk('public')->delete($article->thumbnail_path);
-                    }
-                }
-
                 $articles->delete();
                 $message = 'Artikel terpilih berhasil dihapus.';
                 break;
