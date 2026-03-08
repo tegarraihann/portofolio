@@ -1,1 +1,0 @@
-import{F as o}from"./Footer-BnRMb4Wl.js";import{b as t,o as a,e,H as r,d as c}from"./app-BlxHIPWr.js";const n={class:"min-h-screen bg-gray-50"},_={class:"flex-1"},i={class:"bg-gray-900 text-white"},f={__name:"LandingLayout",setup(d){return(s,l)=>(a(),t("div",n,[e("main",_,[r(s.$slots,"default")]),e("footer",i,[c(o)])]))}};export{f as _};

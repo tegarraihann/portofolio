@@ -34,6 +34,7 @@
 </template>
 
 <script setup>
+import axios from 'axios'
 import { ref, onBeforeUnmount, computed, watch, onMounted } from 'vue'
 import { Editor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
@@ -122,22 +123,23 @@ const handleImageUpload = async (event) => {
   const formData = new FormData()
   formData.append('image', file)
 
-  const csrf = document.querySelector('meta[name=\"csrf-token\"]')?.getAttribute('content')
   const uploadUrl = typeof route === 'function' ? route('admin.articles.uploadImage') : '/admin/articles/upload-image'
 
-  const res = await fetch(uploadUrl, {
-    method: 'POST',
-    headers: { 'X-CSRF-TOKEN': csrf, Accept: 'application/json' },
-    body: formData,
-  })
+  try {
+    const { data } = await axios.post(uploadUrl, formData, {
+      headers: {
+        Accept: 'application/json',
+      },
+    })
 
-  if (!res.ok) {
+    if (data?.url) {
+      editor.value?.chain().focus().setImage({ src: data.url, alt: file.name }).run()
+    }
+  } catch (error) {
     alert('Upload gambar gagal')
-    return
+  } finally {
+    event.target.value = ''
   }
-  const data = await res.json()
-  if (data?.url) editor.value?.chain().focus().setImage({ src: data.url, alt: file.name }).run()
-  event.target.value = ''
 }
 
 const insertTable = () => {
