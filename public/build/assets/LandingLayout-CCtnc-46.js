@@ -1,0 +1,1 @@
+import{F as o}from"./Footer-9gSzBb03.js";import{b as t,o as a,e,I as r,d as c}from"./app-CAGL4a3w.js";const n={class:"min-h-screen bg-gray-50"},_={class:"flex-1"},i={class:"bg-gray-900 text-white"},f={__name:"LandingLayout",setup(d){return(s,l)=>(a(),t("div",n,[e("main",_,[r(s.$slots,"default")]),e("footer",i,[c(o)])]))}};export{f as _};

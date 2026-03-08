@@ -1,1 +1,0 @@
-import{b as a,o as s,Y as e}from"./app-D8CeDGRm.js";const r="/images/admin-logo.png",l={__name:"ApplicationLogo",setup(n){return(o,t)=>(s(),a("img",e({src:r,alt:"Logo",class:"h-24 w-24 object-contain rounded-xl bg-gray-200 p-3 shadow-sm"},o.$attrs),null,16))}};export{l as _};
